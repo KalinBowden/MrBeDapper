@@ -88,6 +88,9 @@ const template =
 [
     {label: electron.app.getName(), submenu: 
         [
+            {label: 'Save As', click: _=>{mainWindow.webContents.send('task:upload')}},
+            {label: 'Open', click: _=>{mainWindow.webContents.send('task:download')}},
+            {type: 'separator'},
             {label: 'Add Item', click: _=>{createAddWindow()}},
             {label: 'Clear Items', click(){mainWindow.webContents.send('item:clear')}},
             {type: 'separator'}, 

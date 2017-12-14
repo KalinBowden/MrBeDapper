@@ -65,6 +65,11 @@
         const {ipcRenderer} = electron;
         const ul = document.querySelector('#task');
         var counter = 0;
+        var app = require('electron').remote;
+        var dialog = app.dialog;
+        var fs =  require('fs');
+        
+
         // Fade in timer
         var startInterval = setInterval(_=>
         {
@@ -136,11 +141,13 @@
         // Read in and display the JSON task file
         ipcRenderer.on('task:download', _=>{
             responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to download. a JSON file", "UK English Male", {pitch: 1});
+            openFile();
         });
 
         // Save the task as a JSON file
         ipcRenderer.on('task:upload', _=>{
             responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to upload. a JSON file", "UK English Male", {pitch: 1});
+            saveFile();
         });
 
         // Refresh the current page
@@ -170,6 +177,101 @@
             {
                 ul.innerHTML = 'Your List is Empty';
             }   
+        }
+
+        function saveFile()
+        {
+            dialog.showSaveDialog((filename) => {
+                if (filename === undefined)
+                {
+                    alert('You must give a file a name.');
+                    return;
+                }
+
+                //
+                fs.writeFile(filename, createJSONTask(), (err)=>{
+                    if(err)
+                    {
+                        console.log(err)
+                    }
+                    alert("The file has been saved!");
+                })
+            });
+        }
+
+        //
+        function openFile()
+        {
+            dialog.showOpenDialog((filenames) => {
+                if(filenames === undefined)
+                {
+                    alert("No files were selected");
+                    return;
+                }
+
+                readFile(filenames[0]);
+            })
+        }
+
+        // JSOn dash file
+        function readFile(filepath)
+        {
+            fs.readFile(filepath, 'utf-8', (err,data) =>{
+                if(err){
+                    alert('Oops... Looks like something went wrong');
+                    return;
+                }
+
+                //
+                console.log('Results: ' + data);
+                temp = JSON.parse(data);
+                console.log(temp);    
+                
+                for (var i = 0; i < temp.table.length; i++)
+                {
+                    console.log('try again: ' + temp.table[i].task);
+
+                    var li = document.createElement('li');
+                    li.classList.add('collection-item');
+                    li.classList.add('z-depth-5');
+                    li.classList.add('task');
+                    li.innerHTML = 
+
+                    '<div class="row">' +
+                                '<div class="col s6">'+temp.table[i].task+'</div>' +
+                                '<div class="col s1"></div>' +
+                                '<div class="col s1"></div>' +
+                                '<div class="col s4"></div>' +
+                            '</div>'
+                            
+                    document.getElementById('task').appendChild(li);
+                }
+            })
+        }
+
+        // Create JSON string
+        function createJSONTask()
+        {
+            //
+            var data = {}
+            data.table = [];
+            var JsonData;
+            var tasks = document.getElementById('task');
+
+            //
+            for (var i = 0; i < task.childElementCount; i++)
+            {
+                console.log(i);
+                console.log(task.children[i].children[0].children[0].innerHTML);
+                
+                data.table.push({'task': task.children[i].children[0].children[0].innerHTML});
+            }
+
+            //
+            JsonData = JSON.stringify(data);
+            console.log(JsonData.toString());
+
+            return JsonData;
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
