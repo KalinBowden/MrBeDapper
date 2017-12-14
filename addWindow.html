@@ -1,0 +1,40 @@
+<html class="add">
+    <head>
+        <!--
+        Desc:   The main html page for the Electron app.
+        Dev:    Kalin Bowden.
+        Date: 11.29.2017.
+        -->
+        <title>My Task List</title>
+
+        <!-- Soruces -->
+        <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+        
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <form>
+            <div>
+                <label>Enter a Task</label>
+                <input type="text" id="item" autofocus>
+                <button type="submit">Add Item</button>
+            </div>
+        </form>
+        <script>
+            const electron = require('electron');
+            const {ipcRenderer} = electron;
+
+            const form = document.querySelector('form');
+            form.addEventListener('submit', submitForm);
+
+            function submitForm(e)
+            {
+                e.preventDefault();
+                console.log('Grabed e');
+                const item = document.querySelector('#item').value;
+                ipcRenderer.send('item:add', item);
+            }
+        </script>
+    </body>
+</html>

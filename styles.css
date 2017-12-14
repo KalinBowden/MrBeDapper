@@ -1,0 +1,41 @@
+/*
+    Desc:   The custom styles for the Electron app.
+    Dev:    Kalin Bowden.
+    Date: 11.29.2017.
+*/
+
+html
+{
+    /*background-color: lightgreen;*/
+
+    background-color:rgba(152,251,152,0.3);
+}
+
+.btn-floating
+{
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.sidebar
+{
+    text-align: center;
+    padding-top: 1em;
+}
+
+.add
+{
+    text-align: center;
+    padding: 1em;
+    background-color:rgba(152,251,152,1);
+}
+
+.task
+{
+    margin: .5em;
+}
+
+ul
+{
+    background-color: none;
+}

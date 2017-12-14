@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <!--
+        Desc:   The main html page for the Electron app.
+        Dev:    Kalin Bowden.
+        Date: 11.29.2017.
+        -->
+        <title>Mr BeDapper</title>
+
+        <!-- Soruces -->
+        <!-- Compiled and minified CSS -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+        <link rel="stylesheet" href="styles.css">
+        
+    </head>
+
+    <!-- Body Start -->
+    <body>
+        
+        <!-- Header for the App -->
+         <nav>
+            <div class="nav-wrapper">
+                <a href="#!" class="brand-logo"><i class="large material-icons">face</i>Mr BeDapper</a>
+                <!-- Header List -->
+                <ul class="right">
+                    <li><a><i class="material-icons" id="download">cloud_download</i></a></li>
+                    <li><a><i class="material-icons" id="upload">backup</i></a></li>
+                    <li><a><i class="material-icons" id="refresh">refresh</i></a></li>
+                    <li><a><i class="material-icons" id="close">close</i></a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content for app -->
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col s1 sidebar">
+                <a class="btn-floating btn-large waves-effect waves-light red" id="account"><i class="medium material-icons">account_circle</i></a>
+                <a class="btn-floating btn-large waves-effect waves-light red" id="add"><i class="large material-icons">add</i></a>
+                <a class="btn-floating btn-large waves-effect waves-light red" id="clear"><i class="material-icons">delete_sweep</i></a>
+                <a class="btn-floating btn-large waves-effect waves-light red" id="voice"><i class="material-icons">hearing</i></a>
+            </div>
+            <!-- Task List -->
+            <div class="col s11">
+                <ul class="collection" id="task">Your List is Empty</ul>
+            </div>
+        </div>
+        
+
+    <!-- Insert this line above script imports  -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <!-- normal script imports etc  -->
+    <script src="scripts/jquery.min.js"></script>    
+    <script src="scripts/vendor.js"></script>
+    <script>require('./index.js')</script>
+    <script>if (window.module) module = window.module;</script>
+    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+
+    <!-- Main page functionality -->
+    <script>
+        // Script variables
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+        const ul = document.querySelector('#task');
+        var counter = 0;
+        // Fade in timer
+        var startInterval = setInterval(_=>
+        {
+            counter += 0.02;
+            document.querySelector('html').style.opacity = counter;
+            document.querySelector('body').style.opacity = counter;
+            document.querySelector('html').style.backgroundColor = 'rgba(152,251,152,'+counter/2+')';
+        }, 100);
+
+
+        // App intro
+        responsiveVoice.speak("Hello Keerstin. I am Mr BeDapper. Your personal assistant! How may I help you today", "UK English Male", {pitch: 1});
+
+
+        // Add a task to the list
+        ipcRenderer.on('item:add', function(e, item)
+        {
+            // Dispaly on empty list
+            if(ul.innerHTML === 'Your List is Empty')
+            {
+                ul.innerHTML = '';
+            }
+
+
+            // Create and add task node
+            const li = document.createElement('li');
+            li.classList.add('collection-item');
+            li.classList.add('z-depth-5');
+            li.classList.add('task');
+            console.log('the item was added');
+            const itemText = document.createTextNode(item);
+            li.innerHTML= createRow(itemText);
+            ul.appendChild(li);
+
+            // Read out that the item was added to the list
+            responsiveVoice.speak("The task. "+item+". was added to your list!", "UK English Male", {pitch: 1});
+        })
+
+
+        // Format and Add task section
+        function createRow(itemText)
+        {
+            var temp;
+            temp = '<div class="row">' +
+                        '<div class="col s6">'+itemText.nodeValue +'</div>' +
+                        '<div class="col s1"></div>' +
+                        '<div class="col s1"></div>' +
+                        '<div class="col s4"></div>' +
+                    '</div>'
+
+            return temp;
+        }
+
+
+        // Clear all task in the list
+        ipcRenderer.on('item:clear', function()
+        {
+            ul.innerHTML = 'Your List is Empty';
+            responsiveVoice.speak("All task from your list have been cleared!", "UK English Male", {pitch: 1});
+            console.log('the list was cleared');
+        });
+
+        // Access accounts
+        // TODO
+        ipcRenderer.on('app:account', _=>{
+            responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to create, manage, and switch between different accounts.", "UK English Male", {pitch: 1});
+        });
+
+        // Read in and display the JSON task file
+        ipcRenderer.on('task:download', _=>{
+            responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to download. a JSON file", "UK English Male", {pitch: 1});
+        });
+
+        // Save the task as a JSON file
+        ipcRenderer.on('task:upload', _=>{
+            responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to upload. a JSON file", "UK English Male", {pitch: 1});
+        });
+
+        // Refresh the current page
+        ipcRenderer.on('app:refresh', _=>{
+            responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to refresh. the app page", "UK English Male", {pitch: 1});
+        });
+
+        // Enable or disable the voice
+        ipcRenderer.on('app:voice', _=>{
+            responsiveVoice.speak("although it does not currently work. This button will eventualy allow you to. enable. or disable. my beautful voice", "UK English Male", {pitch: 1});
+            createJSONTask();
+        });
+
+        // Remove a single task
+        ul.addEventListener('dblclick', removeItem);
+
+        // Remove a single task
+        function removeItem(e)
+        {
+            if(ul.innerHTML !== 'Your List is Empty')
+            {
+                e.target.remove();
+            }
+            
+            // Dispaly a list empty message
+            if (ul.innerHTML === '')
+            {
+                ul.innerHTML = 'Your List is Empty';
+            }   
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    </body>
+</html>
